@@ -19,7 +19,7 @@ class MyUser(TimestampMixin, db.Model):
     bio = db.Column(db.Text)
 
     def set_password(self, password):
-        self.password = bcrypt.hashpw(password, bcrypt.gensalt())
+        self.password = bcrypt.hashpw(password, bcrypt.gensalt()).decode('utf-8')
 
     def check_password(self, password):
-        return bcrypt.checkpw(password, self.password)
+        return bcrypt.checkpw(password.encode('utf-8'), self.password.encode('utf-8'))
