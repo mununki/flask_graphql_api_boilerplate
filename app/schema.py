@@ -1,6 +1,7 @@
 import graphene
 from graphene_sqlalchemy import SQLAlchemyObjectType
-from flask_jwt_extended import (JWTManager, jwt_required, create_access_token, get_jwt_identity)
+from flask_jwt_extended import (JWTManager, jwt_required, create_access_token, decode_token)
+from flask import request
 
 from app import db
 from app import jwt
@@ -12,11 +13,25 @@ class MyUserType(SQLAlchemyObjectType):
         model = MyUser
 
 
-class Query(graphene.ObjectType):
+class GetMyProfile(graphene.ObjectType):
+    ok = graphene.Boolean()
+    error = graphene.String()
     me = graphene.Field(MyUserType)
 
+
+class Query(graphene.ObjectType):
+    me = graphene.Field(GetMyProfile)
+
     def resolve_me(self, info):
-        return {id: "1"}
+        user_id = decode_token(info.context.headers.get('authorization'))['identity']
+        if user_id:
+            user = MyUser.query.filter_by(id=user_id).first()
+            if user:
+                return GetMyProfile(ok=True, error=None, me=user)
+            else:
+                return GetMyProfile(ok=False, error="Not existing user", me=None)
+        else:
+            return GetMyProfile(ok=False, error="Login Required", me=None)
 
 
 class SignUpResponse(graphene.Mutation):

@@ -94,9 +94,32 @@ mutation {
 }
 ```
 
+### Get Profile
+
+> Http request authorization headers
+> Authorization: {token}
+
+```graphql
+query {
+  me {
+    ok
+    error
+    me {
+      id
+      email
+      firstname
+      lastname
+      bio
+      createdAt
+      updatedAt
+    }
+  }
+}
+```
+
 ## Next to do
 
 - [x] Sign Up
-- [ ] Sign In with JWT
+- [x] Sign In with JWT
+- [x] Change profile
 - [ ] Change password
-- [ ] Change profile
