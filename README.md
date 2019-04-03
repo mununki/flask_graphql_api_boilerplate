@@ -82,6 +82,18 @@ mutation {
 }
 ```
 
+### Sign In
+
+```graphql
+mutation {
+  signIn(email: "flask@graphql.com", password: "12345678") {
+    ok
+    error
+    token
+  }
+}
+```
+
 ## Next to do
 
 - [x] Sign Up
