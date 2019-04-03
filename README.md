@@ -19,6 +19,12 @@ This is a Flask + GraphQL API boilerplate with JSON web token.
 
 ## Configuration
 
+### Dependencies
+
+```shell
+$ pip install -r requirements.txt
+```
+
 ### `config.py`
 
 ```python
