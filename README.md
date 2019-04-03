@@ -1,27 +1,31 @@
 # Flask + GraphQL + boilerplate
 
-This is a basic api boilerplate with Flask + GraphQL.
+This is a Flask + GraphQL API boilerplate with JSON web token.
 
 ## Stack
 
 - Flask
+- GraphQL : Flask-GraphQL
 - ORM : Flask-SQLAlchemy
 - Password encryption : bcrypt
-- GraphQL : Flask-GraphQL
-- DB : psycopg2-binary
+- Authentication: JSON web token
+- DB : Postgres(psycopg2-binary)
 
 ## Feature
 
 - GraphQL API
 - User Sign Up / Sign In / Change password / Change profile
-- JSON Web Token
+- JSON Web Token Authentication
 
-## DB Initialization
+## Configuration
 
 ### `config.py`
 
 ```python
 SQLALCHEMY_DATABASE_URI = 'postgres://<username>:<password>@<db_address = localhost>:5432/<db_name>'
+SQLALCHEMY_TRACK_MODIFICATIONS = True
+JWT_SECRET_KEY = 'secret'  # you must change this.
+JWT_ACCESS_TOKEN_EXPIRES = 2592000
 ```
 
 ### Set a DB model
@@ -42,13 +46,11 @@ class MyUser(db.Model):
     bio = db.Column(db.String)
 ```
 
-### Initialize
+### DB initialization and migration
 
 ```shell
 $ python db.py db init
 ```
-
-## DB Migration
 
 ```shell
 $ python db.py db migrate
@@ -56,6 +58,28 @@ $ python db.py db upgrade
 ```
 
 ## Query
+
+### Get Profile
+
+> http request authorization headers -> Authorization: {token}
+
+```graphql
+query {
+  me {
+    ok
+    error
+    me {
+      id
+      email
+      firstname
+      lastname
+      bio
+      createdAt
+      updatedAt
+    }
+  }
+}
+```
 
 ## Mutation
 
@@ -94,17 +118,38 @@ mutation {
 }
 ```
 
-### Get Profile
+### Change Password
 
-> Http request authorization headers
-> Authorization: {token}
+> http request authorization headers -> Authorization: {token}
 
 ```graphql
-query {
-  me {
+mutation {
+  changeProfile(password: "87654321") {
     ok
     error
-    me {
+    user {
+      id
+      email
+      firstname
+      lastname
+      bio
+      createdAt
+      updatedAt
+    }
+  }
+}
+```
+
+### Change Profile
+
+> http request authorization headers -> Authorization: {token}
+
+```graphql
+mutation {
+  changeProfile(bio: "I'm flask user.") {
+    ok
+    error
+    user {
       id
       email
       firstname
@@ -122,4 +167,4 @@ query {
 - [x] Sign Up
 - [x] Sign In with JWT
 - [x] Change profile
-- [ ] Change password
+- [x] Change password

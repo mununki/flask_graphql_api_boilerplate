@@ -66,7 +66,7 @@ class SignUpResponse(graphene.Mutation):
             return SignUpResponse(ok=False, error="Already signed up", user=None)
         else:
             new_user = MyUser(email=email, password=password, firstname=firstname, lastname=lastname)
-            new_user.set_password(password.encode('utf-8'))
+            new_user.set_password(password)
             db.session.add(new_user)
             db.session.commit()
             return SignUpResponse(ok=True, error=None, user=new_user)
@@ -93,6 +93,31 @@ class SignInResponse(graphene.Mutation):
             return SignInResponse(ok=False, error="Not existing user", token=None)
 
 
+class ChangePasswordResponse(graphene.Mutation):
+    ok = graphene.Boolean()
+    error = graphene.String()
+    user = graphene.Field(MyUserType)
+
+    class Arguments:
+        password = graphene.String()
+
+    @signin_required
+    def mutate(self, info, user_id=None, password=None, **kwargs):
+        if not password:
+            return ChangeProfileResponse(ok=False, error="Password required", user=None)
+
+        if user_id:
+            user = MyUser.query.filter_by(id=user_id).first()
+            if user:
+                user.set_password(password)
+                db.session.commit()
+                return ChangeProfileResponse(ok=True, error=None, user=user)
+            else:
+                return ChangeProfileResponse(ok=False, error="Not existing user", user=None)
+        else:
+            return ChangeProfileResponse(ok=False, error="Login required", user=None)
+
+
 class ChangeProfileResponse(graphene.Mutation):
     ok = graphene.Boolean()
     error = graphene.String()
@@ -113,13 +138,12 @@ class ChangeProfileResponse(graphene.Mutation):
                 return ChangeProfileResponse(ok=False, error="Not existing user", user=None)
         else:
             return ChangeProfileResponse(ok=False, error="Login required", user=None)
-            
-
 
 
 class Mutation(graphene.ObjectType):
     sign_up = SignUpResponse.Field()
     sign_in = SignInResponse.Field()
+    change_password = ChangePasswordResponse.Field()
     change_profile = ChangeProfileResponse.Field()
 
 
