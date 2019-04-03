@@ -31,11 +31,15 @@ class SignUpResponse(graphene.Mutation):
         lastname = graphene.String()
 
     def mutate(self, info, email, password, firstname, lastname, **kwargs):
-        new_user = MyUser(email=email, password=password, firstname=firstname, lastname=lastname)
-        new_user.set_password(password.encode('utf-8'))
-        db.session.add(new_user)
-        db.session.commit()
-        return SignUpResponse(ok=True, error=None, user=new_user)
+        user = MyUser.query.filter_by(email=email).first()
+        if user:
+            return SignUpResponse(ok=False, error="Already signed up", user=None)
+        else:
+            new_user = MyUser(email=email, password=password, firstname=firstname, lastname=lastname)
+            new_user.set_password(password.encode('utf-8'))
+            db.session.add(new_user)
+            db.session.commit()
+            return SignUpResponse(ok=True, error=None, user=new_user)
 
 
 class SignInResponse(graphene.Mutation):
