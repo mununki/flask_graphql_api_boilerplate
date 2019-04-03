@@ -16,10 +16,7 @@ This is a Flask + GraphQL API boilerplate with JSON web token.
 - GraphQL API
 - User Sign Up / Sign In / Change password / Change profile
 - JSON Web Token Authentication
-
-## GraphiQL : Playground
-
-**Connect to 'http://localhost:5000/graphql'**
+- GraphiQL : Playground -> http://localhost:5000/graphql
 
 ## Configuration
 
